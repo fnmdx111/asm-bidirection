@@ -1,5 +1,14 @@
 ASM Parser for Exp CPU
 ====
 
-license: lgpl
+How to Run
+----
+
+Run `python exp_cpu_parser.py`
+
+
+License
+----
+
+lgpl
 
