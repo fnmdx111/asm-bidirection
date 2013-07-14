@@ -12,10 +12,14 @@ tokens = (
     'NEWLINE'
 )
 
+# TODO make this lexer aware of the arity of the operator `shl' and `shr'
+
+label_table = {}
+
 operators = [
     # arithmetic instructions
     'add', 'inc', 'adc', 'sub', 'cmp', 'dec', 'sbb',
-    'shl', 'shr', 'shl', 'shr',
+    'shl', 'shr',
     # logic instructions
     'and', 'test', 'or', 'xor', 'not',
     # register instructions
@@ -48,13 +52,18 @@ def t_IMMEDIATE(t):
 
 def t_REGISTER(t):
     r'(?i)r\d+'
+    t.value = t.value.lower()
     return t
 
 
 def t_ID(t):
     r'\w+'
-    if t.value.lower() in operators:
+    lowered = t.value = t.value.lower()
+    if lowered in operators:
         t.type = 'OPERATOR'
+    else:
+        label_table[lowered] = t
+        print 'at', t.lexer.lineno
 
     return t
 
