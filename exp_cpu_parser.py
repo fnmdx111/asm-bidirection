@@ -163,8 +163,10 @@ if __name__ == '__main__':
     print label_imm_table
     print result
     b = 0
-    while result:
-        print '%02x' % result[0],
-        result.pop(0)
-        b += 1
+    with open('test.bin', 'w') as f:
+        while result:
+            print '%02x' % result[0],
+            f.write(chr(result[0]))
+            result.pop(0)
+            b += 1
 

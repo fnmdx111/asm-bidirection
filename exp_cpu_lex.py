@@ -44,40 +44,38 @@ t_ignore_WHITESPACE = r'[\t ]+'
 t_ignore_COMMENT = r';.*'
 
 def t_IMMEDIATE(t):
-    r'(?i)-?(0x[a-f0-9]+|\d+(?![ \t]*[:a-z]))'
+    r"""(?i)-?(0x[a-f0-9]+|\d+(?![ \t]*[:a-z]))"""
     if t.value.isdigit():
         base = 10
         val = t.value
     else:
         base = 16
-        val = t.value.replace('0x', '')
-        val = t.value.replace('0X', '')
+        val = t.value.replace('0x', '').replace('0X', '')
     t.value = int(val, base=base)
 
     return t
 
 
 def t_REGISTER(t):
-    r'(?i)r\d+'
+    r"""(?i)r\d+"""
     t.value = t.value.lower()
     return t
 
 
 def t_ID(t):
-    r'\w+'
+    r"""\w+"""
     lowered = t.value = t.value.lower()
     if lowered in operators:
         t.type = 'OPERATOR'
     else:
         t.type = 'LABEL'
-        # t.value = t.value if not t.value[:1].isdigit() else purify_label(t.value)
         logging.debug('found LABEL %s at line %s', t.value, t.lexer.lineno)
 
     return t
 
 
 def t_NEWLINE(t):
-    r'\n'
+    r"""\n"""
     t.lexer.lineno += 1
     return t
 
