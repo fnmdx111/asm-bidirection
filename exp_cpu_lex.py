@@ -2,6 +2,14 @@
 
 from ply import lex
 
+import logging
+
+def setup_logger():
+    logging.basicConfig(level=logging.DEBUG)
+
+setup_logger()
+
+
 tokens = (
     'IMMEDIATE',
     'OPERATOR',
@@ -9,12 +17,11 @@ tokens = (
     'COMMA',
     'COLON',
     'ID',
-    'NEWLINE'
+    'NEWLINE',
+    'LABEL'
 )
 
 # TODO make this lexer aware of the arity of the operator `shl' and `shr'
-
-label_table = {}
 
 operators = [
     # arithmetic instructions
@@ -28,7 +35,6 @@ operators = [
     'jr', 'jrc', 'jrnc', 'jrz', 'jrnz', 'jmpa',
     'ldrr', 'strr', 'mvrd',
     # test instruction
-    'cld'
 ]
 
 t_COMMA = ','
@@ -38,13 +44,14 @@ t_ignore_WHITESPACE = r'[\t ]+'
 t_ignore_COMMENT = r';.*'
 
 def t_IMMEDIATE(t):
-    r'(?i)0x[a-f0-9]+|\d+(?![ \t]*[:a-z])'
+    r'(?i)-?(0x[a-f0-9]+|\d+(?![ \t]*[:a-z]))'
     if t.value.isdigit():
         base = 10
         val = t.value
     else:
         base = 16
-        val = t.value[2:]
+        val = t.value.replace('0x', '')
+        val = t.value.replace('0X', '')
     t.value = int(val, base=base)
 
     return t
@@ -62,8 +69,9 @@ def t_ID(t):
     if lowered in operators:
         t.type = 'OPERATOR'
     else:
-        label_table[lowered] = t
-        print 'at', t.lexer.lineno
+        t.type = 'LABEL'
+        # t.value = t.value if not t.value[:1].isdigit() else purify_label(t.value)
+        logging.debug('found LABEL %s at line %s', t.value, t.lexer.lineno)
 
     return t
 
@@ -75,7 +83,8 @@ def t_NEWLINE(t):
 
 
 def t_error(t):
-    print 'Illegal character \'%s\'' % t.value[0]
+    logging.error('illegal character \'%s\'', t.value[0])
+
     t.lexer.skip(1)
 
 

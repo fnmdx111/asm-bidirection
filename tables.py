@@ -13,20 +13,24 @@ operator_binary = {
     'mvrr': 0x1f,
     'ldrr': 0x82,
     'strr': 0x83,
-    'mvrd': 0x810,
+    'mvrd': [0x81],
 }
 
 operator_unary = {
     'inc': 0x18,
     'dec': 0x1a,
-    'shl': 0x0d,
-    'shr': 0x0f,
+    'shl': 0x1d,
+    'shr': 0x1e,
     'jr': 0x40,
     'jrc': 0x44,
     'jrnc': 0x45,
     'jrz': 0x42,
     'jrnz': 0x43,
-    'jmpa': 0x4f00,
+    'jmpa': [0x4f, 0],
+}
+
+operator_nullary = {
+    'cld': NotImplemented
 }
 
 register = {
@@ -36,17 +40,4 @@ register = {
     'r3': 3,
     'r4': 4,
 }
-
-from exp_cpu_lex import label_table, lexer
-from exp_cpu_parser import parser
-
-
-
-if __name__ == '__main__':
-    parser.parse(open('sample.asm', 'r').read(),
-                 lexer=lexer)
-
-    label_table = dict(zip(label_table.keys(),
-                           range(len(label_table))))
-    print label_table
 
