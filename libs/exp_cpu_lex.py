@@ -108,7 +108,7 @@ def t_error(t):
 lexer = lex.lex(debug=0)
 
 if __name__ == '__main__':
-    lexer.input(open('sample.asm', 'r').read())
+    lexer.input(open('../sample.asm', 'r').read())
     while True:
         tok = lexer.token()
         if not tok:

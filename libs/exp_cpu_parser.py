@@ -1,12 +1,13 @@
 # encoding: utf-8
 
-from ply import yacc
-from misc import sgn, b, r, imm, gen_byte_counter
-from tables import register, operator_binary, operator_unary, operator_nullary
-from exp_cpu_lex import tokens, lexer
-
-
 import logging
+
+from ply import yacc
+
+from libs.misc import sgn, b, r, imm, gen_byte_counter
+from libs.tables import register, operator_binary, operator_unary, operator_nullary
+from libs.exp_cpu_lex import tokens, lexer
+
 
 def setup_logger():
     logging.basicConfig(level=logging.DEBUG)
@@ -168,7 +169,7 @@ if __name__ == '__main__':
     print label_imm_table
     print result
     b = 0
-    with open('test.bin', 'w') as f:
+    with open('../test.bin', 'w') as f:
         while result:
             print '%02x' % result[0],
             f.write(chr(result[0]))
