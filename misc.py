@@ -1,9 +1,12 @@
 # encoding: utf-8
+
 import string
 
 
 def sgn(imm, mask=0xff):
     """
+    get the two's complement of imm
+
     >>> sgn(-31, 0xff)
     225
     """
@@ -21,6 +24,8 @@ def purify_label(label):
 
 def b(*args):
     """
+    flatten args
+
     >>> b([0x40, 0], 2, 3)
     [64, 0, 2, 3]
     """
@@ -36,23 +41,24 @@ def b(*args):
 
 def r(pos1, pos2):
     """
+    lazily build two nibbles into a single byte
+
     >>> r(1, 0)()
     16
     """
-    arg1, arg2 = lambda: pos1, lambda: pos2
-    if callable(pos1):
-        arg1 = pos1
-    if callable(pos2):
-        arg2 = pos2
+    make_callable = lambda _: (lambda: _) if not callable(_) else _
+    arg1, arg2 = make_callable(pos1), make_callable(pos2)
 
     # arg1 and arg2 are both callable
     return lambda: int('%01x%01x' % (arg1(), arg2()), base=16)
 
 
 def imm(word):
-    """split a word imm into a two-byte imm
+    """
+    split a word imm into two byte imms
+
     >>> imm(0x1234)
-    (18, 52)
+    [18, 52]
     """
     return [(word & 0xff00) >> 8, word & 0xff]
 

@@ -92,12 +92,14 @@ def p_instruction_imm(p):
 
 
 class PendingLabel(object):
-    def __init__(self, name, func, args):
+    """lazy evaluation of labels"""
+    def __init__(self, name, func, args=[]):
         self.name = name
         self.func = func
         self.func_args = args
     def __call__(self):
-        return self.func(label_imm_table[self.name], *self.func_args)
+        return self.func(label_imm_table[self.name],
+                         *self.func_args)
     def __str__(self):
         return '%s(\'%s\', %s)' % (self.func.__name__,
                                    self.name,
@@ -113,11 +115,14 @@ def p_instruction_label(p):
 
     inc()
 
-    if 'j' not in p[1]:
+    if 'jr' not in p[1]:
         operand = PendingLabel(p[2], sgn, [0xff])
     else:
+        # this is a relative jump instruction
         current_byte = get() # immediately get the current position
-        operand = PendingLabel(p[2], lambda l_imm: sgn(l_imm - current_byte, 0xff), [])
+        operand = PendingLabel(p[2],
+                               lambda l_imm: sgn(l_imm - current_byte,
+                                                 0xff))
     p[0] = b(operator_unary[p[1]],
              operand)
 
@@ -169,4 +174,5 @@ if __name__ == '__main__':
             f.write(chr(result[0]))
             result.pop(0)
             b += 1
+
 

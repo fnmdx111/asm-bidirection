@@ -26,7 +26,7 @@ operator_unary = {
     'jrnc': 0x45,
     'jrz': 0x42,
     'jrnz': 0x43,
-    'jmpa': [0x4f, 0],
+    'jmpa': [0x4f, 0], # this is a 2-byte instruction
 }
 
 operator_nullary = {
