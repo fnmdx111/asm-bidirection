@@ -4,9 +4,9 @@ import logging
 
 from ply import yacc
 
-from libs.misc import sgn, b, r, imm, gen_byte_counter
-from libs.tables import register, operator_binary, operator_unary, operator_nullary
-from libs.exp_cpu_lex import tokens, lexer
+from p.misc import sgn, b, r, w2b, gen_byte_counter
+from p.tables import register, operator_binary, operator_unary, operator_nullary
+from p.exp_cpu_lex import tokens, lexer
 
 
 def setup_logger():
@@ -54,7 +54,7 @@ def p_instruction_r_imm(p):
 
     p[0] = b(operator_binary[p[1]],
              r(register[p[2]], 0), # no sr so there's a 4-bit padding here
-             imm(sgn(p[4], 0xffff)))
+             w2b(sgn(p[4], 0xffff)))
 
 
 def p_instruction_r_label(p):
@@ -83,18 +83,25 @@ def p_instruction_r(p):
 
 def p_instruction_imm(p):
     """instruction : OPERATOR IMMEDIATE NEWLINE"""
-    logging.debug('imm OPRT %s IMM %s, size=%s',
-                  p[1], p[2], 2)
+    size, operand = 2, p[2]
+    if 'jr' in p[1]:
+        operand = sgn(p[2], 0xff)
+    elif 'jmp' in p[1]:
+        size = 4
+        operand = w2b(operand)
 
-    inc()
+    logging.debug('imm OPRT %s IMM %s, size=%s',
+                  p[1], operand, size)
+
+    inc(size)
 
     p[0] = b(operator_unary[p[1]],
-             sgn(p[2], 0xff))
+             operand)
 
 
 class PendingLabel(object):
     """lazy evaluation of labels"""
-    def __init__(self, name, func, args=[]):
+    def __init__(self, name, func, args=()):
         self.name = name
         self.func = func
         self.func_args = args

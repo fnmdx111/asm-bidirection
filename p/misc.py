@@ -53,11 +53,11 @@ def r(pos1, pos2):
     return lambda: int('%01x%01x' % (arg1(), arg2()), base=16)
 
 
-def imm(word):
+def w2b(word):
     """
     split a word imm into two byte imms
 
-    >>> imm(0x1234)
+    >>> w2b(0x1234)
     [18, 52]
     """
     return [(word & 0xff00) >> 8, word & 0xff]
