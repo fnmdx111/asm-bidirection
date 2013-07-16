@@ -16,9 +16,9 @@ Dependency
 Result
 ----
 
-In branch `embed-assembling-in-parser`, this parser can now act as an assembler,
-producing machine code which agree with the instruction spec
- at [here](https://github.com/brickgao/CPU_Exercise/blob/master/op_codes.md ).
+This parser can now act as an assembler, producing machine code
+which agree with the instruction spec at
+[here](https://github.com/brickgao/CPU_Exercise/blob/master/op_codes.md ).
 
 Run `python main.py` to find out more.
 
