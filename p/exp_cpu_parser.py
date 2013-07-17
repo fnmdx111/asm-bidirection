@@ -170,7 +170,7 @@ def p_error(_):
 parser = yacc.yacc(method='LALR')
 
 if __name__ == '__main__':
-    result = parser.parse(open('sample.asm').read(),
+    result = parser.parse(open('../sample.asm').read(),
                           lexer=lexer)
     result = [item() if callable(item) else item for item in result]
     print label_imm_table

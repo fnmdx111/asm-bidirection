@@ -8,7 +8,6 @@ LOOP:
     MVRD R4,1
     AND R4,R1
     JRZ 1F
-    jmpa 2000
     ADD R2,R0
 1F:
     SHL R0 ; 逻辑左移一位
