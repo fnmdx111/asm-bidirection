@@ -14,7 +14,7 @@ operator_binary = {
     'mvrr': 0x1f,
     'ldrr': 0x82,
     'strr': 0x83,
-    'mvrd': [0x81],
+    'mvrd': 0x81,
 }
 
 operator_unary = {
@@ -27,7 +27,7 @@ operator_unary = {
     'jrnc': 0x45,
     'jrz': 0x42,
     'jrnz': 0x43,
-    'jmpa': [0x4f, 0], # this is a 2-byte instruction
+    'jmpa': 0x4f00, # this is a 2-byte instruction
 }
 
 operator_nullary = {
@@ -41,4 +41,10 @@ register = {
     'r3': 3,
     'r4': 4,
 }
+
+operators = {}
+operators.update(operator_nullary)
+operators.update(operator_unary)
+operators.update(operator_binary)
+
 
