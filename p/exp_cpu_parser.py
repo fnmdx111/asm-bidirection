@@ -18,7 +18,6 @@ setup_logger()
 label_imm_table = {}
 get, inc = gen_byte_counter()
 
-root = BTNode(None)
 
 def p_stmt_inst(p):
     """stmt : stmt instruction
@@ -194,7 +193,7 @@ def ast(input_str):
 
     result.traverse(force)
 
-    return root
+    return result
 
 
 if __name__ == '__main__':
