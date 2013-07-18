@@ -4,6 +4,7 @@ operator_binary = {
     'add': 0x10,
     'adc': 0x14,
     'sub': 0x12,
+    'sbb': 0x16,
     'cmp': 0x02,
     'and': 0x11,
     'test': 0x01,
