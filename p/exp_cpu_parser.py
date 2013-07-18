@@ -4,8 +4,9 @@ import logging
 
 from ply import yacc
 
-from p.misc import sgn, b, r, w2b, gen_byte_counter
-from p.tables import register, operator_binary, operator_unary, operator_nullary
+from p.libs.ast_structure import *
+from p.libs.bin_tree import BTNode
+from p.libs.misc import sgn, gen_byte_counter
 from p.exp_cpu_lex import tokens, lexer
 
 
@@ -17,21 +18,21 @@ setup_logger()
 label_imm_table = {}
 get, inc = gen_byte_counter()
 
+root = BTNode(None)
 
 def p_stmt_inst(p):
     """stmt : stmt instruction
             | stmt label
             | instruction
             | label"""
-    if len(p) == 2 and p[1] is not None:
-        p[0] = []
-        p[0] += p[1]
-    elif len(p) == 3 and p[1] is not None:
+    if len(p) == 2 and p[1]:
+        p[0] = BTNode(p[1])
+    elif len(p) == 3 and p[1]:
         p[0] = p[1]
         if p[0] is None:
-            p[0] = []
+            p[0] = BTNode(None)
         if p[2]:
-            p[0] += p[2]
+            p[0].append(p[2])
 
 
 def p_instruction_r_r(p):
@@ -41,8 +42,11 @@ def p_instruction_r_r(p):
 
     inc()
 
-    p[0] = b(operator_binary[p[1]],
-             r(register[p[2]], register[p[4]]))
+    p[0] = InstRR(p[1],
+                  p[2],
+                  p[4])
+    # p[0] = b(operator_binary[p[1]],
+    #          r(register[p[2]], register[p[4]]))
 
 
 def p_instruction_r_imm(p):
@@ -52,9 +56,12 @@ def p_instruction_r_imm(p):
 
     inc(4)
 
-    p[0] = b(operator_binary[p[1]],
-             r(register[p[2]], 0), # no sr so there's a 4-bit padding here
-             w2b(sgn(p[4], 0xffff)))
+    p[0] = InstRImm(p[1],
+                    p[2],
+                    sgn(p[4], 0xffff))
+    # p[0] = b(operator_binary[p[1]],
+    #          r(register[p[2]], 0), # no sr so there's a 4-bit padding here
+    #          w2b(sgn(p[4], 0xffff)))
 
 
 def p_instruction_r_label(p):
@@ -64,9 +71,12 @@ def p_instruction_r_label(p):
 
     inc()
 
-    p[0] = b(operator_binary[p[1]],
-             r(register[p[2]],
-               PendingLabel(p[4], sgn, [0xf])))
+    p[0] = InstRImm(p[1],
+                    p[2],
+                    PendingLabel(p[4], sgn, [0xf]))
+    # p[0] = b(operator_binary[p[1]],
+    #          r(register[p[2]],
+    #            PendingLabel(p[4], sgn, [0xf])))
 
 
 def p_instruction_r(p):
@@ -76,9 +86,11 @@ def p_instruction_r(p):
 
     inc()
 
-    p[0] = b(operator_unary[p[1]],
-             r(register[p[2]],
-               0))
+    p[0] = InstR(p[1],
+                 p[2])
+    # p[0] = b(operator_unary[p[1]],
+    #          r(register[p[2]],
+    #            0))
 
 
 def p_instruction_imm(p):
@@ -88,15 +100,16 @@ def p_instruction_imm(p):
         operand = sgn(p[2], 0xff)
     elif 'jmp' in p[1]:
         size = 4
-        operand = w2b(operand)
 
     logging.debug('imm OPRT %s IMM %s, size=%s',
                   p[1], operand, size)
 
     inc(size)
 
-    p[0] = b(operator_unary[p[1]],
-             operand)
+    p[0] = InstImm(p[1],
+                   operand)
+    # p[0] = b(operator_unary[p[1]],
+    #          operand)
 
 
 class PendingLabel(object):
@@ -131,8 +144,10 @@ def p_instruction_label(p):
         operand = PendingLabel(p[2],
                                lambda l_imm: sgn(l_imm - current_byte,
                                                  0xff))
-    p[0] = b(operator_unary[p[1]],
-             operand)
+    p[0] = InstImm(p[1],
+                   operand)
+    # p[0] = b(operator_unary[p[1]],
+    #          operand)
 
 
 def p_instruction_nullary(p):
@@ -142,15 +157,14 @@ def p_instruction_nullary(p):
 
     inc()
 
-    p[0] = b(operator_nullary[p[1]])
+    p[0] = InstNoArg(p[1])
+    # p[0] = b(operator_nullary[p[1]])
 
 
 def p_instruction_empty(p):
     """instruction : NEWLINE"""
     logging.debug('empty, size=%s',
                   0)
-
-    p[0] = b()
 
 
 def p_label(p):
@@ -160,7 +174,7 @@ def p_label(p):
                   p[1], get())
 
     label_imm_table[p[1]] = get()
-    p[0] = b()
+    p[0] = Label(p[1], get())
 
 
 def p_error(_):
@@ -169,18 +183,21 @@ def p_error(_):
 
 parser = yacc.yacc(method='LALR')
 
+
+def ast(input_str):
+    result = parser.parse(input_str, lexer=lexer)
+
+    def force(inst):
+        if 'Imm' in inst.__class__.__name__:
+            if callable(inst.imm):
+                inst.imm = inst.imm()
+
+    result.traverse(force)
+
+    return root
+
+
 if __name__ == '__main__':
-    result = parser.parse(open('../sample.asm').read(),
-                          lexer=lexer)
-    result = [item() if callable(item) else item for item in result]
-    print label_imm_table
-    print result
-    b = 0
-    with open('../test.bin', 'w') as f:
-        while result:
-            print '%02x' % result[0],
-            f.write(chr(result[0]))
-            result.pop(0)
-            b += 1
+    ast(open('../sample.asm', 'r').read()).traverse(lambda _: _)
 
 

@@ -135,19 +135,20 @@ class Simulator(object):
             # jump instruction
 
             absolute, jump = False, False
-            if op_code == 0:
+            if op_code == 0:            # jr
                 jump = True
-            elif op_code == 0x04:
+            elif op_code == 0x04:       # jrc
                 jump = self._c_flag
             elif op_code == 0x05:
-                jump = not self._c_flag
+                jump = not self._c_flag # jrnc
             elif op_code == 0x02:
-                jump = self._z_flag
+                jump = self._z_flag     # jrz
             elif op_code == 0x03:
-                jump = not self._z_flag
-            elif op_code == 0x0f:
+                jump = not self._z_flag # jrnz
+            elif op_code == 0x0f:       # jmpa
                 jump = True
                 absolute = True
+
             if not absolute:
                 if jump:
                     self._pc += i_2c(self._ir[1], size=8)
