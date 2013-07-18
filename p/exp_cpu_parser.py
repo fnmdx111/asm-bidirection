@@ -6,7 +6,7 @@ from ply import yacc
 
 from p.libs.ast_structure import *
 from p.libs.bin_tree import BTNode
-from p.libs.misc import sgn, w2b, gen_byte_counter
+from p.libs.misc import sgn, gen_byte_counter
 from p.exp_cpu_lex import tokens, lexer
 
 
@@ -58,7 +58,7 @@ def p_instruction_r_imm(p):
 
     p[0] = InstRImm(p[1],
                     p[2],
-                    w2b(sgn(p[4], 0xffff)))
+                    sgn(p[4], 0xffff))
     # p[0] = b(operator_binary[p[1]],
     #          r(register[p[2]], 0), # no sr so there's a 4-bit padding here
     #          w2b(sgn(p[4], 0xffff)))
@@ -100,7 +100,6 @@ def p_instruction_imm(p):
         operand = sgn(p[2], 0xff)
     elif 'jmp' in p[1]:
         size = 4
-        operand = w2b(operand)
 
     logging.debug('imm OPRT %s IMM %s, size=%s',
                   p[1], operand, size)
@@ -175,6 +174,7 @@ def p_label(p):
                   p[1], get())
 
     label_imm_table[p[1]] = get()
+    p[0] = Label(p[1], get())
 
 
 def p_error(_):
@@ -189,7 +189,8 @@ def ast(input_str):
 
     def force(inst):
         if 'Imm' in inst.__class__.__name__:
-            inst.imm = inst.imm()
+            if callable(inst.imm):
+                inst.imm = inst.imm()
 
     result.traverse(force)
 
@@ -197,6 +198,6 @@ def ast(input_str):
 
 
 if __name__ == '__main__':
-    ast(open('../sample.asm', 'r').read()).traverse()
+    ast(open('../sample.asm', 'r').read()).traverse(lambda _: _)
 
 

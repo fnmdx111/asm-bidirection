@@ -1,4 +1,7 @@
 # encoding: utf-8
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 class BTNode(object):
     """A binary tree that grows to the right."""
@@ -41,8 +44,10 @@ class BTNode(object):
     @staticmethod
     def _traverse(node, f):
         if node:
-            print node.d
             f(node.d)
+
+            logging.debug(node.d)
+
             BTNode._traverse(node.left, f)
             BTNode._traverse(node.right, f)
 

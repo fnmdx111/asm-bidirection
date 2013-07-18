@@ -52,3 +52,10 @@ class InstNoArg(Instruction):
         super(InstNoArg, self).__init__(op_code)
 
 
+class Label(Instruction):
+    def __init__(self, name, pos):
+        super(Label, self).__init__(None)
+        self.name = name
+        self.pos = pos
+
+
