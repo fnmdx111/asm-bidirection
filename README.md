@@ -23,6 +23,9 @@ which agree with the instruction spec at
 
 Run `python main.py` to find out more.
 
+In branch `ast`, asm program is parsed into an abstract syntax tree,
+run `python exp_cpu_parser.py` to find out more.
+
 
 Simulator
 ----
