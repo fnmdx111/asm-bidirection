@@ -1,8 +1,8 @@
 # encoding: utf-8
 
-from public_libs.bin_tree import BTNode
-from public_libs.ast_structure import *
-from public_libs.misc import hn, i_2c, ln, mkw
+from shared.bin_tree import BTNode
+from shared.ast_structure import *
+from shared.misc import hn, i_2c, ln, mkw
 
 
 class MachineCodeReader(object):
