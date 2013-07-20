@@ -1,7 +1,7 @@
 # encoding: utf-8
 
-from p.exp_cpu_lex import lexer
-from p.exp_cpu_parser import parser
+from asm_parser.exp_cpu_lex import lexer
+from asm_parser.exp_cpu_parser import parser
 
 if __name__ == '__main__':
     result = parser.parse(open('sample.asm').read(),
