@@ -23,15 +23,13 @@ def p_stmt_inst(p):
     """stmt : stmt instruction
             | instruction"""
     if len(p) == 2 and p[1]:
-        p[0] = BTNode(p[1])
+        p[0] = [p[1]]
     elif len(p) == 3 and p[1]:
         p[0] = p[1]
         if p[0] is None:
-            p[0] = BTNode(None)
+            p[0] = [None]
         if p[2]:
             p[0].append(p[2])
-    else:
-        p[0] = p[0]
 
 
 def p_instruction_r_r_r(p):
@@ -161,7 +159,7 @@ def ast(input_str):
             if callable(inst.imm):
                 inst.imm = inst.imm()
 
-    result.traverse(force)
+    #result.traverse(force)
 
     return result
 
