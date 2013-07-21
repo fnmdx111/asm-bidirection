@@ -110,7 +110,7 @@ def gen_byte_counter():
     byte = [0]
     def get():
         return byte[0]
-    def inc(size=2):
+    def inc(size=4):
         byte[0] += size
     return get, inc
 

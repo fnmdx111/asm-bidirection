@@ -17,30 +17,21 @@ tokens = (
     'OPERATOR',
     'REGISTER',
     'COMMA',
-    'COLON',
+    'LPARAN',
+    'RPARAN',
     'ID',
     'NEWLINE',
-    'LABEL'
 )
 
 # TODO make this lexer aware of the arity of the operator `shl' and `shr'
 
 operators = [
-    # arithmetic instructions
-    'add', 'inc', 'adc', 'sub', 'cmp', 'dec', 'sbb',
-    'shl', 'shr',
-    # logic instructions
-    'and', 'test', 'or', 'xor', 'not',
-    # register instructions
-    'mvrr',
-    # memory instructions
-    'jr', 'jrc', 'jrnc', 'jrz', 'jrnz', 'jmpa',
-    'ldrr', 'strr', 'mvrd',
-    # test instruction
+    'add', 'xor', 'sll', 'mul', 'sw', 'lw'
 ]
 
 t_COMMA = ','
-t_COLON = ':'
+t_LPARAN = '\('
+t_RPARAN = '\)'
 
 t_ignore_WHITESPACE = r'[\t ]+'
 t_ignore_COMMENT = r';.*'
@@ -64,7 +55,7 @@ def t_IMMEDIATE(t):
 
 
 def t_REGISTER(t):
-    r"""(?i)r\d+"""
+    r"""(?i)\$(zero|at|v[0-1]|a[0-3]|t[0-9]|s[0-8]|k[0-1]|gp|sp|fp|ra)"""
 
     # lexer rule for reg, e.g.
     # r0, R1
@@ -82,10 +73,6 @@ def t_ID(t):
     lowered = t.value = t.value.lower()
     if lowered in operators:
         t.type = 'OPERATOR'
-    else:
-        t.type = 'LABEL'
-        logging.debug('found LABEL %s at line %s',
-                      t.value, t.lexer.lineno)
 
     return t
 

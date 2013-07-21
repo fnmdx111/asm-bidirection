@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<program instruction-set="exp-cpu">
+    <statement class="InstRImm" name="r_imm" size="4">
+        <op_code pos="1" type="OPERATOR" />
+        <dr pos="2" type="REGISTER" />
+        <ignored pos="3" type="COMMA" />
+        <imm pos="4" type="IMMEDIATE" />
+        <ignored pos="5" type="NEWLINE" />
+    </statement>
+
+    <statement class="InstRR" name="r_r" size="2">
+        <op_code pos="1" type="OPERATOR" />
+        <dr pos="2" type="REGISTER" />
+        <ignored pos="3" type="COMMA" />
+        <sr pos="4" type="REGISTER" />
+        <ignored pos="5" type="NEWLINE" />
+    </statement>
+
+    <statement class="InstRImm" name="r_label" size="2">
+        <op_code pos="1" type="OPERATOR" />
+        <dr pos="2" type="REGISTER" />
+        <ignored pos="3" type="COMMA" />
+        <imm pos="4" type="LABEL">
+            <call name="PendingLabel">
+                <arg><p pos="4" /></arg>
+                <arg><id>sgn</id></arg>
+                <arg>
+                    <list>
+                        <item>0xf</item>
+                    </list>
+                </arg>
+            </call>
+        </imm>
+    </statement>
+</program>

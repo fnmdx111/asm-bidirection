@@ -4,38 +4,71 @@ class Instruction(object):
     def __init__(self, op_code):
         self.op_code = op_code
     def __str__(self):
-        return 'OP_CODE %s' % self.op_code
+        return 'op_code %s' % self.op_code
+
+
+class InstRRR(Instruction):
+    def __init__(self, op_code, rd, rs, rt):
+        super(InstRRR, self).__init__(op_code)
+        self.rd = rd
+        self.rs = rs
+        self.rt = rt
+    def __str__(self):
+        return super(InstRRR, self).__str__() + ', rd %s rs %s rt %s' % \
+               (self.rd, self.rs, self.rt)
+
+
+class InstRRImm(Instruction):
+    def __init__(self, op_code, rd, rs, imm):
+        super(InstRRImm, self).__init__(op_code)
+        self.rd = rd
+        self.rs = rs
+        self.imm = imm
+    def __str__(self):
+        return super(InstRRImm, self).__str__() + ', rd %s rs %s imm %s' % \
+               (self.rd, self.rs, self.imm)
 
 
 class InstRR(Instruction):
-    def __init__(self, op_code, dr, sr):
+    def __init__(self, op_code, rd, rs):
         super(InstRR, self).__init__(op_code)
 
-        self.dr = dr
-        self.sr = sr
+        self.rd = rd
+        self.rs = rs
     def __str__(self):
-        return super(InstRR, self).__str__() + ', DR %s SR %s' % \
-               (self.dr, self.sr)
+        return super(InstRR, self).__str__() + ', rd %s rs %s' % \
+               (self.rd, self.rs)
+
+
+class InstROffsetR(Instruction):
+    def __init__(self, op_code, rd, offset, rs):
+        super(InstROffsetR, self).__init__(op_code)
+        self.rd = rd
+        self.offset = offset
+        self.rs = rs
+    def __str__(self):
+        return super(InstROffsetR, self).__str__() + ', rd %s offset %s rt %s' % \
+               (self.rd, self.offset, self.rs)
 
 
 class InstRImm(Instruction):
-    def __init__(self, op_code, dr, imm):
+    def __init__(self, op_code, rd, imm):
         super(InstRImm, self).__init__(op_code)
 
-        self.dr = dr
+        self.rd = rd
         self.imm = imm
     def __str__(self):
-        return super(InstRImm, self).__str__() + ', DR %s IMM %s' % \
-               (self.dr, self.imm)
+        return super(InstRImm, self).__str__() + ', rd %s IMM %s' % \
+               (self.rd, self.imm)
 
 
 class InstR(Instruction):
-    def __init__(self, op_code, dr):
+    def __init__(self, op_code, rd):
         super(InstR, self).__init__(op_code)
 
-        self.dr = dr
+        self.rd = rd
     def __str__(self):
-        return super(InstR, self).__str__() + ', DR %s' % self.dr
+        return super(InstR, self).__str__() + ', rd %s' % self.rd
 
 
 class InstImm(Instruction):
