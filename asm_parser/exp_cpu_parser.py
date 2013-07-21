@@ -34,7 +34,6 @@ def p_stmt_inst(p):
         p[0] = p[0]
 
 
-
 def p_instruction_r_r_r(p):
     """instruction : OPERATOR REGISTER COMMA REGISTER COMMA REGISTER NEWLINE"""
     logging.debug('r_r_r OPRT %s REG %s REG %s REG %s, size=%s',
