@@ -1,14 +1,14 @@
 # encoding: utf-8
 
 class Instruction(object):
-    def __init__(self, op_code):
+    def __init__(self, op_code=None):
         self.op_code = op_code
     def __str__(self):
         return 'op_code %s' % self.op_code
 
 
 class InstRRR(Instruction):
-    def __init__(self, op_code, rd, rs, rt):
+    def __init__(self, op_code=None, rd=None, rs=None, rt=None):
         super(InstRRR, self).__init__(op_code)
         self.rd = rd
         self.rs = rs
@@ -19,7 +19,7 @@ class InstRRR(Instruction):
 
 
 class InstRRImm(Instruction):
-    def __init__(self, op_code, rd, rs, imm):
+    def __init__(self, op_code=None, rd=None, rs=None, imm=None):
         super(InstRRImm, self).__init__(op_code)
         self.rd = rd
         self.rs = rs
@@ -30,7 +30,7 @@ class InstRRImm(Instruction):
 
 
 class InstRR(Instruction):
-    def __init__(self, op_code, rd, rs):
+    def __init__(self, op_code=None, rd=None, rs=None):
         super(InstRR, self).__init__(op_code)
 
         self.rd = rd
@@ -41,7 +41,7 @@ class InstRR(Instruction):
 
 
 class InstROffsetR(Instruction):
-    def __init__(self, op_code, rd, offset, rs):
+    def __init__(self, op_code=None, rd=None, offset=None, rs=None):
         super(InstROffsetR, self).__init__(op_code)
         self.rd = rd
         self.offset = offset
@@ -52,7 +52,7 @@ class InstROffsetR(Instruction):
 
 
 class InstRImm(Instruction):
-    def __init__(self, op_code, rd, imm):
+    def __init__(self, op_code=None, rd=None, imm=None):
         super(InstRImm, self).__init__(op_code)
 
         self.rd = rd
@@ -63,7 +63,7 @@ class InstRImm(Instruction):
 
 
 class InstR(Instruction):
-    def __init__(self, op_code, rd):
+    def __init__(self, op_code=None, rd=None):
         super(InstR, self).__init__(op_code)
 
         self.rd = rd
@@ -72,7 +72,7 @@ class InstR(Instruction):
 
 
 class InstImm(Instruction):
-    def __init__(self, op_code, imm):
+    def __init__(self, op_code=None, imm=None):
         super(InstImm, self).__init__(op_code)
 
         self.imm = imm
@@ -81,7 +81,7 @@ class InstImm(Instruction):
 
 
 class InstNoArg(Instruction):
-    def __init__(self, op_code):
+    def __init__(self, op_code=None):
         super(InstNoArg, self).__init__(op_code)
 
 

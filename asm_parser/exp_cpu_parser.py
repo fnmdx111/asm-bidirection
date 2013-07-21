@@ -1,23 +1,19 @@
 # encoding: utf-8
 
 import logging
-
 from ply import yacc
-
 from asm_parser.libs.ast_structure import *
-from shared.bin_tree import BTNode
-from shared.misc import sgn, gen_byte_counter
+from shared.misc import sgn
 from asm_parser.exp_cpu_lex import tokens, lexer
+from asm_parser.libs.auto import def_inst, get, inc
 
-# this is comment
+
 def setup_logger():
     logging.basicConfig(level=logging.DEBUG)
 
 setup_logger()
 
 label_imm_table = {}
-get, inc = gen_byte_counter()
-
 
 def p_stmt_inst(p):
     """stmt : stmt instruction
@@ -32,114 +28,96 @@ def p_stmt_inst(p):
             p[0].append(p[2])
 
 
+@def_inst(name='r_r_r',
+          cls=InstRRR,
+          specs=[('op_code', 1, 'OPERATOR'),
+                 ('rd', 2, 'REGISTER'),
+                 ('ignored', 3, 'COMMA'),
+                 ('rs', 4, 'REGISTER'),
+                 ('ignored', 5, 'COMMA'),
+                 ('rt', 6, 'REGISTER'),
+                 ('ignored', 7, 'NEWLINE')])
 def p_instruction_r_r_r(p):
-    """instruction : OPERATOR REGISTER COMMA REGISTER COMMA REGISTER NEWLINE"""
     logging.debug('r_r_r OPRT %s REG %s REG %s REG %s, size=%s',
                              p[1],   p[2],  p[4],  p[6],    4)
 
-    inc()
 
-    p[0] = InstRRR(p[1],
-                   p[2],
-                   p[4],
-                   p[6])
-
-
+@def_inst(name='r_r_imm',
+          cls=InstRRImm,
+          specs=[('op_code', 1, 'OPERATOR'),
+                 ('rd', 2, 'REGISTER'),
+                 ('ignored', 3, 'COMMA'),
+                 ('rs', 4, 'REGISTER'),
+                 ('ignored', 5, 'COMMA'),
+                 ('imm', 6, 'IMMEDIATE'),
+                 ('ignored', 7, 'NEWLINE')])
 def p_instruction_r_r_imm(p):
-    """instruction : OPERATOR REGISTER COMMA REGISTER COMMA IMMEDIATE NEWLINE"""
     logging.debug('r_r_imm OPRT %s REG %s REG %s IMM %s, size=%s',
                                 p[1],  p[2],  p[4],  p[6],    4)
-    inc()
-
-    p[0] = InstRRImm(p[1],
-                     p[2],
-                     p[4],
-                     p[6])
 
 
+@def_inst(name='r_r',
+          cls=InstRR,
+          specs=[('op_code', 1, 'OPERATOR'),
+                 ('rd', 2, 'REGISTER'),
+                 ('ignored', 3, 'COMMA'),
+                 ('rs', 4, 'REGISTER'),
+                 ('ignored', 5, 'NEWLINE')])
 def p_instruction_r_r(p):
-    """instruction : OPERATOR REGISTER COMMA REGISTER NEWLINE"""
     logging.debug('r_r OPRT %s REG %s REG %s, size=%s',
                   p[1], p[2], p[4], 2)
 
-    inc()
 
-    p[0] = InstRR(p[1],
-                  p[2],
-                  p[4])
-
-
+@def_inst(name='r_imm',
+          cls=InstRImm,
+          specs=[('op_code', 1, 'OPERATOR'),
+                 ('rd', 2, 'REGISTER'),
+                 ('ignored', 3, 'COMMA'),
+                 ('imm', 4, 'IMMEDIATE'),
+                 ('ignored', 5, 'NEWLINE')])
 def p_instruction_r_imm(p):
-    """instruction : OPERATOR REGISTER COMMA IMMEDIATE NEWLINE"""
     logging.debug('r_imm OPRT %s REG %s IMM %s, size=%s',
                   p[1], p[2], p[4], 4)
 
-    inc()
 
-    p[0] = InstRImm(p[1],
-                    p[2],
-                    sgn(p[4], 0xffff))
-
-
+@def_inst(name='r_offset_r',
+          cls=InstROffsetR,
+          specs=[('op_code', 1, 'OPERATOR'),
+                 ('rd', 2, 'REGISTER'),
+                 ('ignored', 3, 'COMMA'),
+                 ('imm', 4, 'IMMEDIATE'),
+                 ('ignored', 5, 'LPARAN'),
+                 ('rs', 6, 'REGISTER'),
+                 ('ignored', 7, 'RPARAN'),
+                 ('ignored', 8, 'NEWLINE')])
 def p_instruction_r_offset_r(p):
-    """instruction : OPERATOR REGISTER COMMA IMMEDIATE LPARAN REGISTER RPARAN NEWLINE"""
     logging.debug('r_offset_r OPRT %s REG %s IMM %s REG %s, size=%s',
                   p[1], p[2], p[4], p[6], 4)
 
-    inc()
 
-    p[0] = InstROffsetR(p[1],
-                        p[2],
-                        p[4],
-                        p[6])
-
-
+@def_inst(name='r',
+          cls=InstR,
+          specs=[('op_code', 1, 'OPERATOR'),
+                 ('rd', 2, 'REGISTER'),
+                 ('ignored', 3, 'NEWLINE')])
 def p_instruction_r(p):
-    """instruction : OPERATOR REGISTER NEWLINE"""
     logging.debug('r OPRT %s REG %s, size=%s',
                   p[1], p[2], 2)
 
-    inc()
 
-    p[0] = InstR(p[1],
-                 p[2])
-    # p[0] = b(operator_unary[p[1]],
-    #          r(register[p[2]],
-    #            0))
-
-
-def p_instruction_imm(p):
-    """instruction : OPERATOR IMMEDIATE NEWLINE"""
-    size, operand = 2, p[2]
-    if 'jr' in p[1]:
-        operand = sgn(p[2], 0xff)
-    elif 'jmp' in p[1]:
-        size = 4
-
-    logging.debug('imm OPRT %s IMM %s, size=%s',
-                  p[1], operand, size)
-
-    inc(size)
-
-    p[0] = InstImm(p[1],
-                   operand)
-    # p[0] = b(operator_unary[p[1]],
-    #          operand)
-
-
+@def_inst(name='',
+          cls=InstNoArg,
+          specs=[('op_code', 1, 'OPERATOR'),
+                 ('ignored', 2, 'NEWLINE')])
 def p_instruction_nullary(p):
-    """instruction : OPERATOR NEWLINE"""
     logging.debug('nullary OPRT %s, size=%s',
                   p[1], 2)
 
-    inc()
 
-    p[0] = InstNoArg(p[1])
-    # p[0] = b(operator_nullary[p[1]])
-
-
+@def_inst(name='empty',
+          cls=object,
+          specs=[('ignored', 1, 'NEWLINE')])
 def p_instruction_empty(_):
-    """instruction : NEWLINE"""
     logging.debug('empty, size=%s',
                   0)
 
@@ -165,6 +143,7 @@ def ast(input_str):
 
 
 if __name__ == '__main__':
-    ast(open('../sample.asm', 'r').read()).traverse(lambda _: _)
+    ast(open('../sample.asm', 'r').read())
+    pass
 
 
