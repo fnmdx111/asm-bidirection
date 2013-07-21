@@ -160,7 +160,7 @@ def ast(input_str):
             if callable(inst.imm):
                 inst.imm = inst.imm()
 
-    result.traverse(force)
+    #result.traverse(force)
 
     return result
 
