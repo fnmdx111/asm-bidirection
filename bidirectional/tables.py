@@ -1,20 +1,15 @@
 # encoding: utf-8
 
-operator_binary = {
-    'add': 0x10,
-    'adc': 0x14,
-    'sub': 0x12,
-    'sbb': 0x16,
-    'cmp': 0x02,
-    'and': 0x11,
-    'test': 0x01,
-    'or': 0x13,
-    'xor': 0x17,
-    'not': 0x19,
-    'mvrr': 0x1f,
-    'ldrr': 0x82,
-    'strr': 0x83,
-    'mvrd': 0x81,
+operators = {
+    'add':(0,32),
+    'sub':(0,34),
+    'lw':(35,0),
+    'sw':(43,0),
+    'and':(0,36),
+    'or':(0,37),
+    'mul':(28,2),
+    'xor':(0,0x26),
+    'sll':(0,0)
 }
 
 operator_unary = {
@@ -35,16 +30,40 @@ operator_nullary = {
 }
 
 register = {
-    'r0': 0,
-    'r1': 1,
-    'r2': 2,
-    'r3': 3,
-    'r4': 4,
+    '$zero' :   0,
+    '$at'   :   1,
+    '$v0'   :   2,
+    '$v1'   :   3,
+    '$a0'   :   4,
+    '$a1'   :   5,
+    '$a2'   :   6,
+    '$a3'   :   7,
+    '$t0'   :   8,
+    '$t1'   :   9,
+    '$t2'   :   10,
+    '$t3'   :   11,
+    '$t4'   :   12,
+    '$t5'   :   13,
+    '$t6'   :   14,
+    '$t7'   :   15,
+    '$s0'   :   16,
+    '$s1'   :   17,
+    '$s2'   :   18,
+    '$s3'   :   19,
+    '$s4'   :   20,
+    '$s5'   :   21,
+    '$s6'   :   22,
+    '$s7'   :   23,
+    '$t8'   :   24,
+    '$t9'   :   25,
+    '$gp'   :   28,
+    '$sp'   :   29,
+    '$k0'   :   26,
+    '$k1'   :   27,
+    '$fp'   :   30,
+    '$s8'   :   30,
+    '$ra'   :   31
 }
 
-operators = {}
-operators.update(operator_nullary)
-operators.update(operator_unary)
-operators.update(operator_binary)
 
 
