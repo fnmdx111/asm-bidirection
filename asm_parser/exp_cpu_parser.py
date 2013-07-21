@@ -9,7 +9,7 @@ from shared.bin_tree import BTNode
 from shared.misc import sgn, gen_byte_counter
 from asm_parser.exp_cpu_lex import tokens, lexer
 
-
+# this is comment
 def setup_logger():
     logging.basicConfig(level=logging.DEBUG)
 
@@ -23,15 +23,13 @@ def p_stmt_inst(p):
     """stmt : stmt instruction
             | instruction"""
     if len(p) == 2 and p[1]:
-        p[0] = BTNode(p[1])
+        p[0] = [p[1]]
     elif len(p) == 3 and p[1]:
         p[0] = p[1]
         if p[0] is None:
-            p[0] = BTNode(None)
+            p[0] = [None]
         if p[2]:
             p[0].append(p[2])
-    else:
-        p[0] = p[0]
 
 
 
@@ -162,7 +160,7 @@ def ast(input_str):
             if callable(inst.imm):
                 inst.imm = inst.imm()
 
-    result.traverse(force)
+    #result.traverse(force)
 
     return result
 
