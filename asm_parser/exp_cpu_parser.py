@@ -30,6 +30,8 @@ def p_stmt_inst(p):
             p[0] = BTNode(None)
         if p[2]:
             p[0].append(p[2])
+    else:
+        p[0] = p[0]
 
 
 
